@@ -1,9 +1,9 @@
-#Fail_of_Default_Terminals_Commands
+# Fail_of_Default_Terminals_Commands
 This should fix the issue:
 Correct the path using the following command:
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
 
-#Terminal_InteliJ_Shortcut
+# Terminal_InteliJ_Shortcut
 How to create a terminal shortcut in intellijay?
 
 Step 1: Check if the idea command already works
@@ -30,7 +30,7 @@ Step 6: open intelliJ with the terminal
 type idea and the intelliJ should open up.
 
 
-#How to delete a Github repository?
+# How to delete a Github repository?
 Steps:
 - Open the repository that you want to delete.
 - Click on "Settings" at the top of the page.
