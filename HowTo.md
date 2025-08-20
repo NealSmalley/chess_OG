@@ -37,4 +37,6 @@ type idea and the intelliJ should open up.
 - Scroll to the bottom of the page to the "Danger Zone".
 - Click on "Delete this repository" and do the following authentication processes.
 
+# How to get escape the Github log?
+- click q
 
