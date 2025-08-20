@@ -40,3 +40,8 @@ type idea and the intelliJ should open up.
 # How to get escape the Github log?
 - click q
 
+# How to generate a toString() function in intelliJ idea?
+- right click on a class name
+- click on "Generate"
+- click on "toString"
+- click on "ok"
