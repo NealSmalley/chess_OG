@@ -45,3 +45,8 @@ type idea and the intelliJ should open up.
 - click on "Generate"
 - click on "toString"
 - click on "ok"
+
+# How to generate a override for equals() and hashCode() in IntelliJ
+- click command n
+- override methods
+- hashCode() and equals()
