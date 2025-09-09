@@ -1,3 +1,6 @@
+# Textbook link:
+https://github.com/danagow/books/blob/master/Core%20Java%20SE%209%20for%20the%20Impatient%2C%202nd%20Edition.pdf
+
 # Fail_of_Default_Terminals_Commands
 This should fix the issue:
 Correct the path using the following command:
