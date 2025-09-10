@@ -1,3 +1,6 @@
+# Textbook link:
+https://github.com/danagow/books/blob/master/Core%20Java%20SE%209%20for%20the%20Impatient%2C%202nd%20Edition.pdf
+
 # Fail_of_Default_Terminals_Commands
 This should fix the issue:
 Correct the path using the following command:
@@ -37,4 +40,16 @@ type idea and the intelliJ should open up.
 - Scroll to the bottom of the page to the "Danger Zone".
 - Click on "Delete this repository" and do the following authentication processes.
 
+# How to get escape the Github log?
+- click q
 
+# How to generate a toString() function in intelliJ idea?
+- right click on a class name
+- click on "Generate"
+- click on "toString"
+- click on "ok"
+
+# How to generate a override for equals() and hashCode() in IntelliJ
+- click command n
+- override methods
+- hashCode() and equals()
