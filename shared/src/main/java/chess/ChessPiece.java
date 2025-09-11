@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -21,6 +22,11 @@ public class ChessPiece {
     /**
      * The various different chess piece options
      */
+//    public enum TeamColor {
+//        WHITE,
+//        BLACK
+//    }
+
     public enum PieceType {
         KING,
         QUEEN,
@@ -55,5 +61,19 @@ public class ChessPiece {
         var moves = new HashSet<ChessMove>();
         moves.add(new ChessMove(new ChessPosition(5,4), new ChessPosition(6,5), null));
         return moves;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }
