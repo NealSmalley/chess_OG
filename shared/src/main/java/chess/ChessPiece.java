@@ -60,13 +60,6 @@ public class ChessPiece {
         var moves = new HashSet<ChessMove>();
         //Simplified pieceType
         var pieceType = piece.getPieceType();
-        //Simplified enums
-        var Pawn = PieceType.PAWN;
-        var Rook = PieceType.ROOK;
-        var Knight = PieceType.KNIGHT;
-        var Bishop = PieceType.BISHOP;
-        var Queen = PieceType.QUEEN;
-        var King = PieceType.KING;
 
         switch(pieceType) {
             //Pawn
