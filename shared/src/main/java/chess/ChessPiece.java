@@ -126,6 +126,32 @@ public class ChessPiece {
         if (firstMove == 0) {
             throw new IllegalArgumentException("firstMove isn't updating");
         }
+        if (standardForward == 0) {
+            throw new IllegalArgumentException("standardForward isn't updating");
+        }
+        if (doubleFor == 0) {
+            throw new IllegalArgumentException("doubleFor isn't updating");
+        }
+        if (singleFor == 0) {
+            throw new IllegalArgumentException("singleFor isn't updating");
+        }
+        if (lAttackRow == 0) {
+            throw new IllegalArgumentException("lAttackRow isn't updating");
+        }
+        if (lAttackCol == 0) {
+            throw new IllegalArgumentException("lAttackCol isn't updating");
+        }
+        if (rAttackRow == 0) {
+            throw new IllegalArgumentException("rAttackRow isn't updating");
+        }
+        if (rAttackCol == 0) {
+            throw new IllegalArgumentException("rAttackCol isn't updating");
+        }
+        if (promotionRow == 0) {
+            throw new IllegalArgumentException("promotionRow isn't updating");
+        }
+
+
 
         //FirstMove
         if (row == firstMove){
@@ -445,9 +471,7 @@ public class ChessPiece {
             return true;
         }
         //if piece is on board
-        else {
             return false;
-        }
     }
 
     public boolean isBound(ChessPosition nextPosition){
@@ -486,7 +510,6 @@ public ChessPosition bottomRCornerFinder(ChessPosition myPosition, ChessBoard bo
             break;
         }
         //empty
-
     }
 
     ChessPosition BottomRight = new ChessPosition(brrow,brcol);
@@ -521,8 +544,6 @@ public ChessPosition bottomLCornerFinder(ChessPosition myPosition, ChessBoard bo
             break;
         }
         //empty
-
-
     }
     ChessPosition BottomLeft = new ChessPosition(blrow,blcol);
     return BottomLeft;
