@@ -231,7 +231,7 @@ public class ChessPiece {
             Nrow++;
             ChessPosition nextPosition = new ChessPosition(Nrow,Col);
             boolean available = available(myPosition, nextPosition, board);
-            boolean isFriend = isFriend(board, myPosition, nextPosition);
+            boolean isFriend = !isEnemy(board, myPosition, nextPosition);
             if (available) {
                 moves.add(new ChessMove(myPosition, nextPosition, null));
                 boolean isEmpty = isEmpty(board, nextPosition);
@@ -249,7 +249,7 @@ public class ChessPiece {
             Nrow--;
             ChessPosition nextPosition = new ChessPosition(Nrow,Col);
             boolean available = available(myPosition, nextPosition, board);
-            boolean isFriend = isFriend(board, myPosition, nextPosition);
+            boolean isFriend = !isEnemy(board, myPosition, nextPosition);
             if (available) {
                 moves.add(new ChessMove(myPosition, nextPosition, null));
                 boolean isEmpty = isEmpty(board, nextPosition);
@@ -267,7 +267,7 @@ public class ChessPiece {
             Ncol++;
             ChessPosition nextPosition = new ChessPosition(Row,Ncol);
             boolean available = available(myPosition, nextPosition, board);
-            boolean isFriend = isFriend(board, myPosition, nextPosition);
+            boolean isFriend = !isEnemy(board, myPosition, nextPosition);
             if (available) {
                 moves.add(new ChessMove(myPosition, nextPosition, null));
                 boolean isEmpty = isEmpty(board, nextPosition);
@@ -285,7 +285,7 @@ public class ChessPiece {
             Ncol--;
             ChessPosition nextPosition = new ChessPosition(Row,Ncol);
             boolean available = available(myPosition, nextPosition, board);
-            boolean isFriend = isFriend(board, myPosition, nextPosition);
+            boolean isFriend = !isEnemy(board, myPosition, nextPosition);
             if (available) {
                 moves.add(new ChessMove(myPosition, nextPosition, null));
                 boolean isEmpty = isEmpty(board, nextPosition);
@@ -419,14 +419,6 @@ public class ChessPiece {
         return false;
     }
 
-    public boolean isFriend(ChessBoard board, ChessPosition myPosition, ChessPosition nextPosition) {
-        if (isBound(nextPosition)){
-            if (!isEmpty(board,nextPosition) && !isEnemy(board, myPosition, nextPosition)){
-                return true;
-            }
-        }
-        return false;
-    }
 
     public boolean isEnemy(ChessBoard board, ChessPosition myPosition, ChessPosition nextPosition) {
         ChessPiece mypiece = board.getPiece(myPosition);
