@@ -1,12 +1,11 @@
 package chess;
 
-import java.util.Arrays;
 import java.util.HashSet;
 
 
 public class Rule {
-    private int repeats;
-    private int[][] coordinates;
+    private final int repeats;
+    private final int[][] coordinates;
 
     public Rule(int repeats, int[][] coordinates) {
         //making these variables accessible to the whole class
@@ -16,7 +15,7 @@ public class Rule {
 
     public HashSet<ChessMove> getMoves(ChessBoard board, ChessPosition myPosition) {
         //moves set
-        HashSet<ChessMove> moves = new HashSet<ChessMove>();
+        HashSet<ChessMove> moves = new HashSet<>();
         //row and column
         int myRow = myPosition.getRow();
         int myCol = myPosition.getColumn();
@@ -63,11 +62,11 @@ public class Rule {
             int attackRCol = myCol + coordinates[attackR][1];
 
             //forward
-            if (isEmpty(board, newforwardRow,myCol, myColor)) {
+            if (isEmpty(board, newforwardRow,myCol)) {
                 //doubleforward
                 if (firstrow == myRow) {
                     //empty
-                    if (isEmpty(board,newDForwardRow,myCol, myColor)){
+                    if (isEmpty(board,newDForwardRow,myCol)){
                         moves.add(new ChessMove(myPosition, new ChessPosition(newDForwardRow, myCol), null));
                     }
                     moves.add(new ChessMove(myPosition, new ChessPosition(newforwardRow, myCol), null));
@@ -84,14 +83,12 @@ public class Rule {
             //attack
             //attacks R
             if (isBound(attackRRow,attackRCol)) {
-                ChessPiece potentialPiece = board.getPiece(new ChessPosition(attackRRow, attackRCol));
                 if (isEnemy(board, attackRRow, attackRCol, myColor)) {
                     promotions(moves, myPosition, new ChessPosition(attackRRow, attackRCol), (attackRRow == finalrow));
                 }
             }
             //attacks L
             if (isBound(attackLRow,attackLCol)) {
-                ChessPiece potentialPiece = board.getPiece(new ChessPosition(attackLRow, attackLCol));
                 if (isEnemy(board, attackLRow, attackLCol, myColor)) {
                     promotions(moves, myPosition, new ChessPosition(attackLRow, attackLCol), (attackLRow == finalrow));
                 }
@@ -119,9 +116,8 @@ public class Rule {
                 }
                 //moves for Rook, Bishop, and Queen
                 while (isBound(newRow, newCol)) {
-                    ChessPiece potentialPiece = board.getPiece(new ChessPosition(newRow, newCol));
                     //Empty
-                    if (isEmpty(board,newRow, newCol, myColor)) {
+                    if (isEmpty(board,newRow, newCol)) {
                         moves.add(new ChessMove(myPosition, new ChessPosition(newRow, newCol), null));
                     }
                     //Blocked
@@ -140,38 +136,22 @@ public class Rule {
         return moves;
     }
     public boolean isBound(int newRow, int newCol){
-        if (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8){
-            return true;
-        }
-        return false;
+        return (newRow >= 1 && newRow <= 8 && newCol >= 1 && newCol <= 8);
     }
     public boolean isAvailable(ChessBoard board, int newRow, int newCol, ChessGame.TeamColor myColor){
-        if (isEmpty(board, newRow, newCol, myColor)){
-            return true;
-        }
-        else if (isEnemy(board, newRow, newCol, myColor)){
-            return true;
-        }
-        return false;
+        return (isEmpty(board, newRow, newCol) || isEnemy(board, newRow, newCol, myColor));
     }
     public boolean isEnemy(ChessBoard board, int Row, int Col, ChessGame.TeamColor myColor) {
         ChessPiece potentialPiece = board.getPiece(new ChessPosition(Row,Col));
-        if (!isEmpty(board,Row, Col, myColor)) {
-            if (potentialPiece.getTeamColor() != myColor) {
-                return true;
-            }
-        }
-        return false;
+        return (!isEmpty(board,Row, Col) && (potentialPiece.getTeamColor() != myColor));
     }
-    public boolean isEmpty(ChessBoard board,int Row,int Col, ChessGame.TeamColor myColor){
-        if (isBound(Row,Col)) {
+    public boolean isEmpty(ChessBoard board,int Row,int Col) {
+        if (isBound(Row, Col)) {
             ChessPiece potentialPiece = board.getPiece(new ChessPosition(Row, Col));
-            if (potentialPiece== null) {
-                return true;
-            }
+            return (potentialPiece == null);
         }
         return false;
-    }
+        }
     public void promotions(HashSet<ChessMove> moves, ChessPosition myPosition, ChessPosition nextPosition, boolean promotion){
         if (promotion) {
             moves.add(new ChessMove(myPosition, nextPosition, ChessPiece.PieceType.QUEEN));
