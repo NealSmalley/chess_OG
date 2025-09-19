@@ -24,75 +24,39 @@ public class Rule {
         ChessGame.TeamColor myColor = myPiece.getTeamColor();
 
 
-        int startcoor;
-        int firstrow;
-        int finalrow;
-        int doubleforward;
-        int attackL;
-        int attackR;
-
-
         //isPawn
         if (repeats == 2) {
-            //Color
-            if (ChessGame.TeamColor.WHITE == myColor) {
-                startcoor = 0;
-                firstrow = 2;
-                finalrow = 8;
-                doubleforward = 1;
-                attackL = 2;
-                attackR = 3;
-            } else {
-                startcoor = 4;
-                firstrow = 7;
-                finalrow = 1;
-                doubleforward = -1;
-                attackL = 6;
-                attackR = 7;
-            }
-            //forward vars
-            int[] forward = coordinates[startcoor];
-            int newforwardRow = myRow + forward[0];
-            int newDForwardRow = newforwardRow + doubleforward;
+            //ternary operators for universal variables (save lines & easier to remember)
+            int verticalMov = (myColor == ChessGame.TeamColor.WHITE) ? +1 : -1;
+            int startRow = (myColor == ChessGame.TeamColor.WHITE) ? 2 : 7;
+            int promoRow = (myColor == ChessGame.TeamColor.WHITE) ? 8 : 1;
 
-            //attack vars
-            int attackLRow = myRow + coordinates[attackL][0];
-            int attackLCol = myCol + coordinates[attackL][1];
-            int attackRRow = myRow + coordinates[attackR][0];
-            int attackRCol = myCol + coordinates[attackR][1];
+            //two vertical move options
+            int singleFRow = myRow + verticalMov;
+            int doubleFRow = myRow + (verticalMov * 2);
 
-            //forward
-            if (isEmpty(board, newforwardRow,myCol)) {
-                //doubleforward
-                if (firstrow == myRow) {
-                    //empty
-                    if (isEmpty(board,newDForwardRow,myCol)){
-                        moves.add(new ChessMove(myPosition, new ChessPosition(newDForwardRow, myCol), null));
-                    }
-                    moves.add(new ChessMove(myPosition, new ChessPosition(newforwardRow, myCol), null));
+            //Single forward
+            if (isBound(singleFRow, myCol) && isEmpty(board, singleFRow, myCol)) {
+                //Promo
+                if (singleFRow == promoRow){
+                    promotions(moves, myPosition, new ChessPosition(singleFRow, myCol),true);
                 }
-                //promotion
-                else if (newforwardRow == finalrow) {
-                    promotions(moves, myPosition, new ChessPosition(newforwardRow, myCol),true);
-                }
+                //Double forward or Single forward no promo
                 else {
-                    moves.add(new ChessMove(myPosition, new ChessPosition(newforwardRow, myCol), null));
+                    moves.add(new ChessMove(myPosition, new ChessPosition(singleFRow, myCol), null));
+                    //Double forward
+                    if (startRow == myRow && isEmpty(board, doubleFRow, myCol)) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(doubleFRow, myCol), null));
+                    }
                 }
             }
+            int attackRow = myRow+verticalMov;
+            int attackColR = myCol-1;
+            int attackColL = myCol+1;
 
             //attack
-            //attacks R
-            if (isBound(attackRRow,attackRCol)) {
-                if (isEnemy(board, attackRRow, attackRCol, myColor)) {
-                    promotions(moves, myPosition, new ChessPosition(attackRRow, attackRCol), (attackRRow == finalrow));
-                }
-            }
-            //attacks L
-            if (isBound(attackLRow,attackLCol)) {
-                if (isEnemy(board, attackLRow, attackLCol, myColor)) {
-                    promotions(moves, myPosition, new ChessPosition(attackLRow, attackLCol), (attackLRow == finalrow));
-                }
-            }
+            attack(moves, board, myColor, myPosition, attackRow, attackColR, promoRow);
+            attack(moves, board, myColor, myPosition, attackRow, attackColL, promoRow);
         }
 
 
@@ -161,6 +125,13 @@ public class Rule {
         }
         else {
             moves.add(new ChessMove(myPosition, nextPosition, null));
+        }
+    }
+    public void attack(HashSet<ChessMove> moves, ChessBoard board, ChessGame.TeamColor myColor, ChessPosition myPosition, int row, int col, int promoRow){
+        if (isBound(row,col)) {
+            if (isEnemy(board, row, col, myColor)) {
+                promotions(moves, myPosition, new ChessPosition(row, col), (row == promoRow));
+            }
         }
     }
 }

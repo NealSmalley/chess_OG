@@ -64,7 +64,7 @@ public class ChessPiece {
             case QUEEN-> new Rule(1, new int[][]{{1, -1}, {-1, 1}, {-1, -1}, {1, 1},{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
             case KING-> new Rule(0, new int[][]{{1, -1}, {1,0},{1,1}, {0,-1},{0,1},{-1,-1},{-1,0},{-1,1}});
             //Wforward, Wdoubleforward, WattackL, WattackR, Bforward, Bdoubleforward, BattackL, BattackR
-            case PAWN-> new Rule(2, new int[][]{{1,0},{2,0},{1,-1},{1,1},{-1,0},{-2,0},{-1,-1},{-1,1}});
+            case PAWN-> new Rule(2, new int[][]{{+1,-1}});
             default -> null;
         };
         return rule.getMoves(board,myPosition);
