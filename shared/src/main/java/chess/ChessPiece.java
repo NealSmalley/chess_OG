@@ -56,600 +56,615 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece piece = board.getPiece(myPosition);
-        var moves = new HashSet<ChessMove>();
-        //Simplified pieceType
-        var pieceType = piece.getPieceType();
-        //Simplified enums
-        var Pawn = PieceType.PAWN;
-        var Rook = PieceType.ROOK;
-        var Knight = PieceType.KNIGHT;
-        var Bishop = PieceType.BISHOP;
-        var Queen = PieceType.QUEEN;
-        var King = PieceType.KING;
-
-        //Pawn
-        if ((pieceType == Pawn)) {
-            pawnMoves(moves, myPosition, board);
-        }
-        //Rooks
-        else if (pieceType == Rook) {
-            rookMoves(moves, myPosition, board);
-        }
-        //Knight
-        else if (pieceType == Knight) {
-            knightMoves(moves, myPosition, board);
-        }
-        //Bishop
-        else if (pieceType == Bishop) {
-            bishopMoves(moves, myPosition, board);
-        }
-        //Queen
-        else if (pieceType == Queen) {
-            queenMoves(moves, myPosition, board);
-        }
-        //King
-        else if (pieceType == King) {
-            kingMoves(moves, myPosition, board);
-        }
-        return moves;
-    }
-
-    public HashSet<ChessMove> pawnMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
-
-        ChessPiece mypiece = board.getPiece(myPosition);
-        ChessGame.TeamColor color = mypiece.getTeamColor();
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-
-        //color-based variables
-        int firstMove = 0;
-        int standardForward = 0;
-        int doubleFor = 0;
-        int singleFor = 0;
-        int lAttackRow = 0;
-        int lAttackCol = 0;
-        int rAttackRow = 0;
-        int rAttackCol = 0;
-        int promotionRow = 0;
-
-        //White
-        if (color == ChessGame.TeamColor.WHITE){
-            firstMove = 2;
-            standardForward = 1;
-            doubleFor = 2;
-            singleFor = 1;
-            lAttackRow = 1;
-            lAttackCol = -1;
-            rAttackRow = 1;
-            rAttackCol = 1;
-            promotionRow = 8;
-        }
-        //Black
-        if (color == ChessGame.TeamColor.BLACK) {
-            firstMove = 7;
-            standardForward = -1;
-            doubleFor = -2;
-            singleFor = -1;
-            lAttackRow = -1;
-            lAttackCol = -1;
-            rAttackRow = -1;
-            rAttackCol = 1;
-            promotionRow = 1;
-        }
-
-
-        //error catch
-        if (firstMove == 0) {
-            throw new IllegalArgumentException("firstMove isn't updating");
-        }
-
-        //FirstMove
-        if (row == firstMove){
-            doubleForward(row, col, doubleFor, singleFor, myPosition, board, moves);
-            standardMoves(row, col, promotionRow, lAttackRow, lAttackCol, rAttackRow, rAttackCol, standardForward, myPosition, board, moves);
-        }
-        else {
-            standardMoves(row, col, promotionRow, lAttackRow, lAttackCol, rAttackRow, rAttackCol, standardForward, myPosition, board, moves);
-        }
-
-        return moves;
-    }
-
-    //Double Forward
-    public void doubleForward(int row, int col, int doubleFor, int singleFor, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves) {
-        int doubleNRow = row+doubleFor;
-        int singleNRow = row+singleFor;
-
-        ChessPosition singlenextPosition = new ChessPosition(singleNRow, col);
-        ChessPosition doublenextPosition = new ChessPosition(doubleNRow, col);
-
-        boolean singleavailable = available(myPosition, singlenextPosition, board);
-        boolean doubleavailable = available(myPosition, doublenextPosition, board);
-
-        boolean doubleisEmpty = isEmpty(board, doublenextPosition);
-        boolean singleisEmpty = isEmpty(board, singlenextPosition);
-        if (doubleavailable && doubleisEmpty && singleavailable && singleisEmpty){
-            moves.add(new ChessMove(myPosition, doublenextPosition, null));
-        }
-    }
-    //Standard Moves
-    public void standardMoves(int row, int col, int promotionRow, int lAttackRow, int lAttackCol, int rAttackRow, int rAttackCol, int standardForward, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves) {
-        forward(row, col, promotionRow, standardForward, myPosition, board, moves);
-        attack(row, col, promotionRow, lAttackRow, lAttackCol, rAttackRow, rAttackCol, board, moves, myPosition);
-    }
-
-    public void forward(int row, int col, int promotionRow, int standForward, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
-        int Nrow = row+standForward;
-        ChessPosition nextPosition = new ChessPosition(Nrow, col);
-        boolean available = available(myPosition, nextPosition, board);
-        boolean isEmpty = isEmpty(board, nextPosition);
-        if (available && isEmpty){
-            if (isPromotion(Nrow, promotionRow)){
-                allPromotions(moves, myPosition, nextPosition);
-            }
-            else {
-                moves.add(new ChessMove(myPosition, nextPosition, null));
-            }
-        }
-    }
-    public boolean isPromotion(int row, int promotionRow){
-        if (row == promotionRow){
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    public void allPromotions(HashSet<ChessMove> moves, ChessPosition myPosition, ChessPosition nextPosition){
-        moves.add(new ChessMove(myPosition, nextPosition, PieceType.QUEEN));
-        moves.add(new ChessMove(myPosition, nextPosition, PieceType.BISHOP));
-        moves.add(new ChessMove(myPosition, nextPosition, PieceType.KNIGHT));
-        moves.add(new ChessMove(myPosition, nextPosition, PieceType.ROOK));
-    }
-
-    public void attack(int row, int col, int promotionRow, int lAttackRow, int lAttackCol, int rAttackRow, int rAttackCol, ChessBoard board, HashSet<ChessMove> moves, ChessPosition myPosition){
-        ChessPosition Lattack = new ChessPosition(row + lAttackRow, col + lAttackCol);
-        ChessPosition Rattack = new ChessPosition(row + rAttackRow, col + rAttackCol);
-
-        //Left Attack
-        if (isEnemy(board,myPosition,Lattack)){
-            if (isPromotion(Lattack.getRow(), promotionRow)){
-                allPromotions(moves, myPosition, Lattack);
-            }
-            else {
-                moves.add(new ChessMove(myPosition, Lattack, null));
-            }
-        }
-        //Right Attack
-        if (isEnemy(board,myPosition,Rattack)){
-            if (isPromotion(Rattack.getRow(), promotionRow)) {
-                allPromotions(moves, myPosition, Rattack);
-            }
-            else {
-                moves.add(new ChessMove(myPosition, Rattack, null));
-            }
-        }
+        Rule rule = switch (getPieceType()){
+            //lefttop, top, righttop, left, right, bottomleft, down, bottomright
+            case BISHOP-> new Rule(1, new int[][]{{1, -1}, {-1, 1}, {-1, -1}, {1, 1}});
+            case ROOK-> new Rule(1, new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
+            case KNIGHT-> new Rule(0, new int[][]{{1,-2},{2,-1},{2,1},{1,2},{-1,2},{-2,1},{-2,-1},{-1,-2}});
+            case QUEEN-> new Rule(1, new int[][]{{1, -1}, {-1, 1}, {-1, -1}, {1, 1},{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
+            case KING-> new Rule(0, new int[][]{{1, -1}, {1,0},{1,1}, {0,-1},{0,1},{-1,-1},{-1,0},{-1,1}});
+            //Wforward, Wdoubleforward, WattackL, WattackR, Bforward, Bdoubleforward, BattackL, BattackR
+            case PAWN-> new Rule(2, new int[][]{{1,0},{2,0},{1,-1},{1,1},{-1,0},{-2,0},{-1,-1},{-1,1}});
+            default -> null;
+        };
+        return rule.getMoves(board,myPosition);
     }
 
 
-    public HashSet<ChessMove> rookMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
-        int myRow = myPosition.getRow();
-        int myCol = myPosition.getColumn();
-        up(myRow, myCol, myPosition,board, moves);
-        down(myRow, myCol, myPosition,board, moves);
-        left(myRow, myCol, myPosition,board, moves);
-        right(myRow, myCol, myPosition,board, moves);
-        return moves;
-    }
-    public void up(int Row, int Col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
-        for(int Nrow = Row; Nrow < 8+Row;){
-            Nrow++;
-            ChessPosition nextPosition = new ChessPosition(Nrow,Col);
-            boolean available = available(myPosition, nextPosition, board);
-            boolean isFriend = isFriend(board, myPosition, nextPosition);
-            if (available) {
-                moves.add(new ChessMove(myPosition, nextPosition, null));
-                boolean isEmpty = isEmpty(board, nextPosition);
-                if (!isEmpty) {
-                    break;
-                }
-            }
-            else if (isFriend){
-                break;
-            }
-        }
-    }
-    public void down(int Row, int Col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
-        for(int Nrow = Row; Nrow > -8-Row;){
-            Nrow--;
-            ChessPosition nextPosition = new ChessPosition(Nrow,Col);
-            boolean available = available(myPosition, nextPosition, board);
-            boolean isFriend = isFriend(board, myPosition, nextPosition);
-            if (available) {
-                moves.add(new ChessMove(myPosition, nextPosition, null));
-                boolean isEmpty = isEmpty(board, nextPosition);
-                if (!isEmpty) {
-                    break;
-                }
-            }
-            else if (isFriend){
-                break;
-            }
-        }
-    }
-    public void right(int Row, int Col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
-        for(int Ncol = Col; Ncol < 8+Col;){
-            Ncol++;
-            ChessPosition nextPosition = new ChessPosition(Row,Ncol);
-            boolean available = available(myPosition, nextPosition, board);
-            boolean isFriend = isFriend(board, myPosition, nextPosition);
-            if (available) {
-                moves.add(new ChessMove(myPosition, nextPosition, null));
-                boolean isEmpty = isEmpty(board, nextPosition);
-                if (!isEmpty) {
-                    break;
-                }
-            }
-            else if (isFriend){
-                break;
-            }
-        }
-    }
-    public void left(int Row, int Col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
-        for(int Ncol = Col; Ncol > -8-Col;){
-            Ncol--;
-            ChessPosition nextPosition = new ChessPosition(Row,Ncol);
-            boolean available = available(myPosition, nextPosition, board);
-            boolean isFriend = isFriend(board, myPosition, nextPosition);
-            if (available) {
-                moves.add(new ChessMove(myPosition, nextPosition, null));
-                boolean isEmpty = isEmpty(board, nextPosition);
-                if (!isEmpty) {
-                    break;
-                }
-            }
-            else if (isFriend){
-                break;
-            }
-        }
-    }
+        //        ChessPiece piece = board.getPiece(myPosition);
+//        var moves = new HashSet<ChessMove>();
+//        //Simplified pieceType
+//        var pieceType = piece.getPieceType();
+//        //Simplified enums
+//        var Pawn = PieceType.PAWN;
+//        var Rook = PieceType.ROOK;
+//        var Knight = PieceType.KNIGHT;
+//        var Bishop = PieceType.BISHOP;
+//        var Queen = PieceType.QUEEN;
+//        var King = PieceType.KING;
+//
+//        //Pawn
+//        if ((pieceType == Pawn)) {
+//            pawnMoves(moves, myPosition, board);
+//        }
+//        //Rooks
+//        else if (pieceType == Rook) {
+//            rookMoves(moves, myPosition, board);
+//        }
+//        //Knight
+//        else if (pieceType == Knight) {
+//            knightMoves(moves, myPosition, board);
+//        }
+//        //Bishop
+//        else if (pieceType == Bishop) {
+//            bishopMoves(moves, myPosition, board);
+//        }
+//        //Queen
+//        else if (pieceType == Queen) {
+//            queenMoves(moves, myPosition, board);
+//        }
+//        //King
+//        else if (pieceType == King) {
+//            kingMoves(moves, myPosition, board);
+//        }
+//        return moves;
+//    }
 
-    public HashSet<ChessMove> knightMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
-        int myRow = myPosition.getRow();
-        int myCol = myPosition.getColumn();
-        topLs(myRow, myCol, myPosition, board, moves);
-        rightLs(myRow, myCol, myPosition, board, moves);
-        leftLs(myRow, myCol, myPosition, board, moves);
-        bottomLs(myRow, myCol, myPosition, board, moves);
-        return moves;
-    }
-    public void topLs(int row, int col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
-        for (int Ncol = col-1; Ncol <= col + 1; Ncol++){
-            int Nrow = row+2;
-            if (Ncol == col){
-                continue;
-            }
-            else {
-                ChessPosition nextPosition = new ChessPosition(Nrow, Ncol);
-                boolean available = available(myPosition, nextPosition, board);
-                if (available) {
-                    moves.add(new ChessMove(myPosition, nextPosition, null));
-                }
-            }
-        }
-    }
-    public void rightLs(int row, int col, ChessPosition myPosition,ChessBoard board, HashSet<ChessMove> moves){
-        for (int Nrow = row-1; Nrow <= row + 1; Nrow++){
-            int Ncol = col + 2;
-            if (Nrow == row){
-                continue;
-            }
-            else {
-                ChessPosition nextPosition = new ChessPosition(Nrow, Ncol);
-                boolean available = available(myPosition, nextPosition, board);
-                if (available) {
-                    moves.add(new ChessMove(myPosition, nextPosition, null));
-                }
-            }
-        }
-    }
-    public void leftLs(int row, int col, ChessPosition myPosition,ChessBoard board, HashSet<ChessMove> moves){
-        for (int Nrow = row-1; Nrow <= row + 1; Nrow++){
-            int Ncol = col - 2;
-            if (Nrow == row){
-                continue;
-            }
-            else {
-                ChessPosition nextPosition = new ChessPosition(Nrow, Ncol);
-                boolean available = available(myPosition, nextPosition, board);
-                if (available) {
-                    moves.add(new ChessMove(myPosition, nextPosition, null));
-                }
-            }
-        }
-    }
-    public void bottomLs(int row, int col, ChessPosition myPosition,ChessBoard board, HashSet<ChessMove> moves){
-        for (int Ncol = col-1; Ncol <= col + 1; Ncol++){
-            int Nrow = row-2;
-            if (Ncol == col){
-                continue;
-            }
-            else {
-                ChessPosition nextPosition = new ChessPosition(Nrow, Ncol);
-                boolean available = available(myPosition, nextPosition, board);
-                if (available) {
-                    moves.add(new ChessMove(myPosition, nextPosition, null));
-                }
-            }
-        }
-    }
-
-    public HashSet<ChessMove> bishopMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
-        //bottom corners finding function
-        ChessPosition bottomR = bottomRCornerFinder(myPosition, board);
-        ChessPosition bottomL = bottomLCornerFinder(myPosition, board);
-        //diagonals function
-        diagonal(bottomR, bottomL, moves, myPosition, board);
-        return moves;
-    }
-
-    public HashSet<ChessMove> queenMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
-        bishopMoves(moves, myPosition, board);
-        rookMoves(moves, myPosition, board);
-        return moves;
-    }
-
-    public HashSet<ChessMove> kingMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
-        int myRow = myPosition.getRow();
-        int myCol = myPosition.getColumn();
-        int iter = 1;
-        //Potential Moves
-        potentialMoves(myRow, myCol, myPosition, moves, board, iter);
-        return moves;
-    }
-
-    //kingMoves helper functions
-    public void potentialMoves(int myRow, int myCol, ChessPosition myPosition, HashSet<ChessMove> moves, ChessBoard board, int iter) {
-        for (int NRow = myRow - iter; NRow <= myRow+iter; NRow++) {
-            for (int NCol = myCol - iter; NCol <= myCol+iter; NCol++) {
-                ChessPosition nextPosition = new ChessPosition(NRow, NCol);
-                boolean available = available(myPosition, nextPosition, board);
-                if (available) {
-                    moves.add(new ChessMove(myPosition, nextPosition, null));
-                }
-            }
-        }
-    }
-
-    public boolean available(ChessPosition myPosition, ChessPosition nextPosition, ChessBoard board) {
-        if (isBound(nextPosition)) {
-            if (isEmpty(board, nextPosition)) {
-                return true;
-            }
-            else if (isEnemy(board, myPosition, nextPosition)){
-                return true;
-            }
-
-        }
-        return false;
-    }
-
-    public boolean isFriend(ChessBoard board, ChessPosition myPosition, ChessPosition nextPosition) {
-        if (isBound(nextPosition)){
-            if (!isEmpty(board,nextPosition) && !isEnemy(board, myPosition, nextPosition)){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isEnemy(ChessBoard board, ChessPosition myPosition, ChessPosition nextPosition) {
-        ChessPiece mypiece = board.getPiece(myPosition);
-        if (isBound(nextPosition)) {
-            boolean isEmpty = isEmpty(board, nextPosition);
-            if (!isEmpty) {
-                ChessPiece nextpiece = board.getPiece(nextPosition);
-                ChessGame.TeamColor myPieceColor = mypiece.getTeamColor();
-                ChessGame.TeamColor nextPieceColor = nextpiece.getTeamColor();
-                //If is enemy color
-                if (!(myPieceColor.equals(nextPieceColor))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean isEmpty(ChessBoard board, ChessPosition nextPosition) {
-        //Find if there is already a piece on the board
-        ChessPiece potentialpiece = board.getPiece(nextPosition);
-        //if piece is not on board
-        if (potentialpiece == null) {
-            return true;
-        }
-        //if piece is on board
-        else {
-            return false;
-        }
-    }
-
-    public boolean isBound(ChessPosition nextPosition){
-        int Row = nextPosition.getRow();
-        int Col = nextPosition.getColumn();
-        if (Row >= 1 && Row <= 8 && Col >= 1 && Col <= 8){
-            return true;
-        }
-        return false;
-    }
-
-
-
-
-
-//bishopMoves helper functions
-//Corner Functions
-public ChessPosition bottomRCornerFinder(ChessPosition myPosition, ChessBoard board) {
-    //Bottom Right rows and columns
-    int brrow = myPosition.getRow();
-    int brcol = myPosition.getColumn();
-
-    //Finds Bottom Right corner
-    while ((brrow > 1 && brcol < 8)) {
-        //Checks the diagonal below
-        brrow = brrow - 1;
-        brcol = brcol + 1;
-        //checks if there is a piece in that position
-        boolean empty = emptyposition(brrow,brcol,board,myPosition);
-        //not empty but a friend
-        if (!empty && !isEnemy(brrow,brcol,board,myPosition)){
-            break;
-        }
-        //not empty but an enemy
-        if (!empty && isEnemy(brrow,brcol,board,myPosition)){
-            break;
-        }
-        //empty
-
-    }
-
-    ChessPosition BottomRight = new ChessPosition(brrow,brcol);
-    return BottomRight;
-}
-public ChessPosition bottomLCornerFinder(ChessPosition myPosition, ChessBoard board) {
-    //Bottom Left rows and columns
-    int blrow = myPosition.getRow();
-    int blcol = myPosition.getColumn();
-
-    //Finds Bottom Left corner
-    while ((blrow > 1 && blcol > 1)) {
-        //checks if there is a piece in that position
-        blrow--;
-        blcol--;
-        //is empty
-        boolean empty = emptyposition(blrow,blcol,board,myPosition);
-
-        //not empty but a friend
-        if (!empty && !isEnemy(blrow,blcol,board,myPosition)){
-            blrow++;
-            blcol++;
-            //not empty and the original
-            if (myPosition.equals(new ChessPosition(blrow,blcol))){
-                blrow++;
-                blcol++;
-                break;
-            }
-        }
-        //not empty but an enemy
-        if (!empty && isEnemy(blrow,blcol,board,myPosition)){
-            break;
-        }
-        //empty
-
-
-    }
-    ChessPosition BottomLeft = new ChessPosition(blrow,blcol);
-    return BottomLeft;
-}
-public boolean emptyposition(int brrow, int brcol, ChessBoard board, ChessPosition myPosition){
-    //Find if there is already a piece on the board
-    ChessPiece potentialpiece = board.getPiece(new ChessPosition(brrow,brcol));
-    //if piece is not on board
-    if (potentialpiece == null) {
-        return true;
-    }
-    //if piece is on board
-    else {
-        return false;
-    }
-}
-public boolean isEnemy(int row, int col, ChessBoard board, ChessPosition myPosition){
-    //If occupid position
-    if (!emptyposition(row,col,board,myPosition)){
-        ChessPiece potentialpiece = board.getPiece(new ChessPosition(row,col));
-        ChessPiece mypiece = board.getPiece(myPosition);
-        ChessGame.TeamColor myPieceColor = mypiece.getTeamColor();
-
-        //If is enemy color
-        if (!(myPieceColor.equals(potentialpiece.getTeamColor()))){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-    else{
-        return false;
-    }
-}
-//Diagonal
-public void diagonal(ChessPosition br, ChessPosition bl, HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
-    //Row and Col values
-    int brRow = br.getRow();
-    int brCol = br.getColumn();
-    int blRow = bl.getRow();
-    int blCol = bl.getColumn();
-
-    //adding corner chess positions
-    if (((myPosition.getRow() != brRow) && (myPosition.getColumn() != brCol))) {
-        moves.add(new ChessMove(myPosition, br, null));
-    }
-    if (((myPosition.getRow() != blRow) && (myPosition.getColumn() != blCol))) {
-        moves.add(new ChessMove(myPosition, bl, null));
-    }
-    //if enemy hit
-    boolean hitPieceBR = false;
-    boolean hitPieceBL = false;
-
-    //While it hasn't hit bounds or the enemy
-    while ((brRow < 8 && brCol > 1) && (!hitPieceBR)) {
-        brRow = brRow + 1;
-        brCol = brCol - 1;
-
-        //is empty
-        if (emptyposition(brRow, brCol, board, myPosition)) {
-            moves.add(new ChessMove(myPosition, new ChessPosition(brRow, brCol), null));
-        }
-        //is an enemy
-        else if (isEnemy(brRow, brCol, board, myPosition)) {
-            moves.add(new ChessMove(myPosition, new ChessPosition(brRow, brCol), null));
-            hitPieceBR = true;
-        }
-        //is a friend and not OG
-        else if (!isEnemy(brRow, brCol, board, myPosition) && !(myPosition.equals(new ChessPosition(brRow,brCol)))) {
-            hitPieceBR = true;
-        }
-        //is original
-        else {
-            continue;
-        }
-
-    }
-    while (blRow < 8 && blCol < 8 && (!hitPieceBL)) {
-        //bl
-        //increment
-        blRow = blRow + 1;
-        blCol = blCol + 1;
-        //is empty
-        if (emptyposition(blRow, blCol, board, myPosition)) {
-            moves.add(new ChessMove(myPosition, new ChessPosition(blRow, blCol), null));
-        }
-        //is an enemy
-        else if (isEnemy(blRow, blCol, board, myPosition)) {
-            moves.add(new ChessMove(myPosition, new ChessPosition(blRow, blCol), null));
-            hitPieceBL = true;
-        }
-        //is a friend not OG
-        else if (!isEnemy(blRow, blCol, board, myPosition) && !(myPosition.equals(new ChessPosition(blRow,blCol)))) {
-            hitPieceBL = true;
-        }
-        //is original
-        else {
-            continue;
-        }
-    }
-}
+//    public HashSet<ChessMove> pawnMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
+//
+//        ChessPiece mypiece = board.getPiece(myPosition);
+//        ChessGame.TeamColor color = mypiece.getTeamColor();
+//        int row = myPosition.getRow();
+//        int col = myPosition.getColumn();
+//
+//        //color-based variables
+//        int firstMove = 0;
+//        int standardForward = 0;
+//        int doubleFor = 0;
+//        int singleFor = 0;
+//        int lAttackRow = 0;
+//        int lAttackCol = 0;
+//        int rAttackRow = 0;
+//        int rAttackCol = 0;
+//        int promotionRow = 0;
+//
+//        //White
+//        if (color == ChessGame.TeamColor.WHITE){
+//            firstMove = 2;
+//            standardForward = 1;
+//            doubleFor = 2;
+//            singleFor = 1;
+//            lAttackRow = 1;
+//            lAttackCol = -1;
+//            rAttackRow = 1;
+//            rAttackCol = 1;
+//            promotionRow = 8;
+//        }
+//        //Black
+//        if (color == ChessGame.TeamColor.BLACK) {
+//            firstMove = 7;
+//            standardForward = -1;
+//            doubleFor = -2;
+//            singleFor = -1;
+//            lAttackRow = -1;
+//            lAttackCol = -1;
+//            rAttackRow = -1;
+//            rAttackCol = 1;
+//            promotionRow = 1;
+//        }
+//
+//
+//        //error catch
+//        if (firstMove == 0) {
+//            throw new IllegalArgumentException("firstMove isn't updating");
+//        }
+//
+//        //FirstMove
+//        if (row == firstMove){
+//            doubleForward(row, col, doubleFor, singleFor, myPosition, board, moves);
+//            standardMoves(row, col, promotionRow, lAttackRow, lAttackCol, rAttackRow, rAttackCol, standardForward, myPosition, board, moves);
+//        }
+//        else {
+//            standardMoves(row, col, promotionRow, lAttackRow, lAttackCol, rAttackRow, rAttackCol, standardForward, myPosition, board, moves);
+//        }
+//
+//        return moves;
+//    }
+//
+//    //Double Forward
+//    public void doubleForward(int row, int col, int doubleFor, int singleFor, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves) {
+//        int doubleNRow = row+doubleFor;
+//        int singleNRow = row+singleFor;
+//
+//        ChessPosition singlenextPosition = new ChessPosition(singleNRow, col);
+//        ChessPosition doublenextPosition = new ChessPosition(doubleNRow, col);
+//
+//        boolean singleavailable = available(myPosition, singlenextPosition, board);
+//        boolean doubleavailable = available(myPosition, doublenextPosition, board);
+//
+//        boolean doubleisEmpty = isEmpty(board, doublenextPosition);
+//        boolean singleisEmpty = isEmpty(board, singlenextPosition);
+//        if (doubleavailable && doubleisEmpty && singleavailable && singleisEmpty){
+//            moves.add(new ChessMove(myPosition, doublenextPosition, null));
+//        }
+//    }
+//    //Standard Moves
+//    public void standardMoves(int row, int col, int promotionRow, int lAttackRow, int lAttackCol, int rAttackRow, int rAttackCol, int standardForward, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves) {
+//        forward(row, col, promotionRow, standardForward, myPosition, board, moves);
+//        attack(row, col, promotionRow, lAttackRow, lAttackCol, rAttackRow, rAttackCol, board, moves, myPosition);
+//    }
+//
+//    public void forward(int row, int col, int promotionRow, int standForward, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
+//        int Nrow = row+standForward;
+//        ChessPosition nextPosition = new ChessPosition(Nrow, col);
+//        boolean available = available(myPosition, nextPosition, board);
+//        boolean isEmpty = isEmpty(board, nextPosition);
+//        if (available && isEmpty){
+//            if (isPromotion(Nrow, promotionRow)){
+//                allPromotions(moves, myPosition, nextPosition);
+//            }
+//            else {
+//                moves.add(new ChessMove(myPosition, nextPosition, null));
+//            }
+//        }
+//    }
+//    public boolean isPromotion(int row, int promotionRow){
+//        if (row == promotionRow){
+//            return true;
+//        }
+//        else {
+//            return false;
+//        }
+//    }
+//
+//    public void allPromotions(HashSet<ChessMove> moves, ChessPosition myPosition, ChessPosition nextPosition){
+//        moves.add(new ChessMove(myPosition, nextPosition, PieceType.QUEEN));
+//        moves.add(new ChessMove(myPosition, nextPosition, PieceType.BISHOP));
+//        moves.add(new ChessMove(myPosition, nextPosition, PieceType.KNIGHT));
+//        moves.add(new ChessMove(myPosition, nextPosition, PieceType.ROOK));
+//    }
+//
+//    public void attack(int row, int col, int promotionRow, int lAttackRow, int lAttackCol, int rAttackRow, int rAttackCol, ChessBoard board, HashSet<ChessMove> moves, ChessPosition myPosition){
+//        ChessPosition Lattack = new ChessPosition(row + lAttackRow, col + lAttackCol);
+//        ChessPosition Rattack = new ChessPosition(row + rAttackRow, col + rAttackCol);
+//
+//        //Left Attack
+//        if (isEnemy(board,myPosition,Lattack)){
+//            if (isPromotion(Lattack.getRow(), promotionRow)){
+//                allPromotions(moves, myPosition, Lattack);
+//            }
+//            else {
+//                moves.add(new ChessMove(myPosition, Lattack, null));
+//            }
+//        }
+//        //Right Attack
+//        if (isEnemy(board,myPosition,Rattack)){
+//            if (isPromotion(Rattack.getRow(), promotionRow)) {
+//                allPromotions(moves, myPosition, Rattack);
+//            }
+//            else {
+//                moves.add(new ChessMove(myPosition, Rattack, null));
+//            }
+//        }
+//    }
+//
+//
+//    public HashSet<ChessMove> rookMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
+//        int myRow = myPosition.getRow();
+//        int myCol = myPosition.getColumn();
+//        up(myRow, myCol, myPosition,board, moves);
+//        down(myRow, myCol, myPosition,board, moves);
+//        left(myRow, myCol, myPosition,board, moves);
+//        right(myRow, myCol, myPosition,board, moves);
+//        return moves;
+//    }
+//    public void up(int Row, int Col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
+//        for(int Nrow = Row; Nrow < 8+Row;){
+//            Nrow++;
+//            ChessPosition nextPosition = new ChessPosition(Nrow,Col);
+//            boolean available = available(myPosition, nextPosition, board);
+//            boolean isFriend = isFriend(board, myPosition, nextPosition);
+//            if (available) {
+//                moves.add(new ChessMove(myPosition, nextPosition, null));
+//                boolean isEmpty = isEmpty(board, nextPosition);
+//                if (!isEmpty) {
+//                    break;
+//                }
+//            }
+//            else if (isFriend){
+//                break;
+//            }
+//        }
+//    }
+//    public void down(int Row, int Col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
+//        for(int Nrow = Row; Nrow > -8-Row;){
+//            Nrow--;
+//            ChessPosition nextPosition = new ChessPosition(Nrow,Col);
+//            boolean available = available(myPosition, nextPosition, board);
+//            boolean isFriend = isFriend(board, myPosition, nextPosition);
+//            if (available) {
+//                moves.add(new ChessMove(myPosition, nextPosition, null));
+//                boolean isEmpty = isEmpty(board, nextPosition);
+//                if (!isEmpty) {
+//                    break;
+//                }
+//            }
+//            else if (isFriend){
+//                break;
+//            }
+//        }
+//    }
+//    public void right(int Row, int Col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
+//        for(int Ncol = Col; Ncol < 8+Col;){
+//            Ncol++;
+//            ChessPosition nextPosition = new ChessPosition(Row,Ncol);
+//            boolean available = available(myPosition, nextPosition, board);
+//            boolean isFriend = isFriend(board, myPosition, nextPosition);
+//            if (available) {
+//                moves.add(new ChessMove(myPosition, nextPosition, null));
+//                boolean isEmpty = isEmpty(board, nextPosition);
+//                if (!isEmpty) {
+//                    break;
+//                }
+//            }
+//            else if (isFriend){
+//                break;
+//            }
+//        }
+//    }
+//    public void left(int Row, int Col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
+//        for(int Ncol = Col; Ncol > -8-Col;){
+//            Ncol--;
+//            ChessPosition nextPosition = new ChessPosition(Row,Ncol);
+//            boolean available = available(myPosition, nextPosition, board);
+//            boolean isFriend = isFriend(board, myPosition, nextPosition);
+//            if (available) {
+//                moves.add(new ChessMove(myPosition, nextPosition, null));
+//                boolean isEmpty = isEmpty(board, nextPosition);
+//                if (!isEmpty) {
+//                    break;
+//                }
+//            }
+//            else if (isFriend){
+//                break;
+//            }
+//        }
+//    }
+//
+//    public HashSet<ChessMove> knightMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
+//        int myRow = myPosition.getRow();
+//        int myCol = myPosition.getColumn();
+//        topLs(myRow, myCol, myPosition, board, moves);
+//        rightLs(myRow, myCol, myPosition, board, moves);
+//        leftLs(myRow, myCol, myPosition, board, moves);
+//        bottomLs(myRow, myCol, myPosition, board, moves);
+//        return moves;
+//    }
+//    public void topLs(int row, int col, ChessPosition myPosition, ChessBoard board, HashSet<ChessMove> moves){
+//        for (int Ncol = col-1; Ncol <= col + 1; Ncol++){
+//            int Nrow = row+2;
+//            if (Ncol == col){
+//                continue;
+//            }
+//            else {
+//                ChessPosition nextPosition = new ChessPosition(Nrow, Ncol);
+//                boolean available = available(myPosition, nextPosition, board);
+//                if (available) {
+//                    moves.add(new ChessMove(myPosition, nextPosition, null));
+//                }
+//            }
+//        }
+//    }
+//    public void rightLs(int row, int col, ChessPosition myPosition,ChessBoard board, HashSet<ChessMove> moves){
+//        for (int Nrow = row-1; Nrow <= row + 1; Nrow++){
+//            int Ncol = col + 2;
+//            if (Nrow == row){
+//                continue;
+//            }
+//            else {
+//                ChessPosition nextPosition = new ChessPosition(Nrow, Ncol);
+//                boolean available = available(myPosition, nextPosition, board);
+//                if (available) {
+//                    moves.add(new ChessMove(myPosition, nextPosition, null));
+//                }
+//            }
+//        }
+//    }
+//    public void leftLs(int row, int col, ChessPosition myPosition,ChessBoard board, HashSet<ChessMove> moves){
+//        for (int Nrow = row-1; Nrow <= row + 1; Nrow++){
+//            int Ncol = col - 2;
+//            if (Nrow == row){
+//                continue;
+//            }
+//            else {
+//                ChessPosition nextPosition = new ChessPosition(Nrow, Ncol);
+//                boolean available = available(myPosition, nextPosition, board);
+//                if (available) {
+//                    moves.add(new ChessMove(myPosition, nextPosition, null));
+//                }
+//            }
+//        }
+//    }
+//    public void bottomLs(int row, int col, ChessPosition myPosition,ChessBoard board, HashSet<ChessMove> moves){
+//        for (int Ncol = col-1; Ncol <= col + 1; Ncol++){
+//            int Nrow = row-2;
+//            if (Ncol == col){
+//                continue;
+//            }
+//            else {
+//                ChessPosition nextPosition = new ChessPosition(Nrow, Ncol);
+//                boolean available = available(myPosition, nextPosition, board);
+//                if (available) {
+//                    moves.add(new ChessMove(myPosition, nextPosition, null));
+//                }
+//            }
+//        }
+//    }
+//
+//    public HashSet<ChessMove> bishopMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
+//        //bottom corners finding function
+//        ChessPosition bottomR = bottomRCornerFinder(myPosition, board);
+//        ChessPosition bottomL = bottomLCornerFinder(myPosition, board);
+//        //diagonals function
+//        diagonal(bottomR, bottomL, moves, myPosition, board);
+//        return moves;
+//    }
+//
+//    public HashSet<ChessMove> queenMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
+//        bishopMoves(moves, myPosition, board);
+//        rookMoves(moves, myPosition, board);
+//        return moves;
+//    }
+//
+//    public HashSet<ChessMove> kingMoves(HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
+//        int myRow = myPosition.getRow();
+//        int myCol = myPosition.getColumn();
+//        int iter = 1;
+//        //Potential Moves
+//        potentialMoves(myRow, myCol, myPosition, moves, board, iter);
+//        return moves;
+//    }
+//
+//    //kingMoves helper functions
+//    public void potentialMoves(int myRow, int myCol, ChessPosition myPosition, HashSet<ChessMove> moves, ChessBoard board, int iter) {
+//        for (int NRow = myRow - iter; NRow <= myRow+iter; NRow++) {
+//            for (int NCol = myCol - iter; NCol <= myCol+iter; NCol++) {
+//                ChessPosition nextPosition = new ChessPosition(NRow, NCol);
+//                boolean available = available(myPosition, nextPosition, board);
+//                if (available) {
+//                    moves.add(new ChessMove(myPosition, nextPosition, null));
+//                }
+//            }
+//        }
+//    }
+//
+//    public boolean available(ChessPosition myPosition, ChessPosition nextPosition, ChessBoard board) {
+//        if (isBound(nextPosition)) {
+//            if (isEmpty(board, nextPosition)) {
+//                return true;
+//            }
+//            else if (isEnemy(board, myPosition, nextPosition)){
+//                return true;
+//            }
+//
+//        }
+//        return false;
+//    }
+//
+//    public boolean isFriend(ChessBoard board, ChessPosition myPosition, ChessPosition nextPosition) {
+//        if (isBound(nextPosition)){
+//            if (!isEmpty(board,nextPosition) && !isEnemy(board, myPosition, nextPosition)){
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    public boolean isEnemy(ChessBoard board, ChessPosition myPosition, ChessPosition nextPosition) {
+//        ChessPiece mypiece = board.getPiece(myPosition);
+//        if (isBound(nextPosition)) {
+//            boolean isEmpty = isEmpty(board, nextPosition);
+//            if (!isEmpty) {
+//                ChessPiece nextpiece = board.getPiece(nextPosition);
+//                ChessGame.TeamColor myPieceColor = mypiece.getTeamColor();
+//                ChessGame.TeamColor nextPieceColor = nextpiece.getTeamColor();
+//                //If is enemy color
+//                if (!(myPieceColor.equals(nextPieceColor))) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
+//
+//    public boolean isEmpty(ChessBoard board, ChessPosition nextPosition) {
+//        //Find if there is already a piece on the board
+//        ChessPiece potentialpiece = board.getPiece(nextPosition);
+//        //if piece is not on board
+//        if (potentialpiece == null) {
+//            return true;
+//        }
+//        //if piece is on board
+//        else {
+//            return false;
+//        }
+//    }
+//
+//    public boolean isBound(ChessPosition nextPosition){
+//        int Row = nextPosition.getRow();
+//        int Col = nextPosition.getColumn();
+//        if (Row >= 1 && Row <= 8 && Col >= 1 && Col <= 8){
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//
+//
+//
+//
+////bishopMoves helper functions
+////Corner Functions
+//public ChessPosition bottomRCornerFinder(ChessPosition myPosition, ChessBoard board) {
+//    //Bottom Right rows and columns
+//    int brrow = myPosition.getRow();
+//    int brcol = myPosition.getColumn();
+//
+//    //Finds Bottom Right corner
+//    while ((brrow > 1 && brcol < 8)) {
+//        //Checks the diagonal below
+//        brrow = brrow - 1;
+//        brcol = brcol + 1;
+//        //checks if there is a piece in that position
+//        boolean empty = emptyposition(brrow,brcol,board,myPosition);
+//        //not empty but a friend
+//        if (!empty && !isEnemy(brrow,brcol,board,myPosition)){
+//            break;
+//        }
+//        //not empty but an enemy
+//        if (!empty && isEnemy(brrow,brcol,board,myPosition)){
+//            break;
+//        }
+//        //empty
+//
+//    }
+//
+//    ChessPosition BottomRight = new ChessPosition(brrow,brcol);
+//    return BottomRight;
+//}
+//public ChessPosition bottomLCornerFinder(ChessPosition myPosition, ChessBoard board) {
+//    //Bottom Left rows and columns
+//    int blrow = myPosition.getRow();
+//    int blcol = myPosition.getColumn();
+//
+//    //Finds Bottom Left corner
+//    while ((blrow > 1 && blcol > 1)) {
+//        //checks if there is a piece in that position
+//        blrow--;
+//        blcol--;
+//        //is empty
+//        boolean empty = emptyposition(blrow,blcol,board,myPosition);
+//
+//        //not empty but a friend
+//        if (!empty && !isEnemy(blrow,blcol,board,myPosition)){
+//            blrow++;
+//            blcol++;
+//            //not empty and the original
+//            if (myPosition.equals(new ChessPosition(blrow,blcol))){
+//                blrow++;
+//                blcol++;
+//                break;
+//            }
+//        }
+//        //not empty but an enemy
+//        if (!empty && isEnemy(blrow,blcol,board,myPosition)){
+//            break;
+//        }
+//        //empty
+//
+//
+//    }
+//    ChessPosition BottomLeft = new ChessPosition(blrow,blcol);
+//    return BottomLeft;
+//}
+//public boolean emptyposition(int brrow, int brcol, ChessBoard board, ChessPosition myPosition){
+//    //Find if there is already a piece on the board
+//    ChessPiece potentialpiece = board.getPiece(new ChessPosition(brrow,brcol));
+//    //if piece is not on board
+//    if (potentialpiece == null) {
+//        return true;
+//    }
+//    //if piece is on board
+//    else {
+//        return false;
+//    }
+//}
+//public boolean isEnemy(int row, int col, ChessBoard board, ChessPosition myPosition){
+//    //If occupid position
+//    if (!emptyposition(row,col,board,myPosition)){
+//        ChessPiece potentialpiece = board.getPiece(new ChessPosition(row,col));
+//        ChessPiece mypiece = board.getPiece(myPosition);
+//        ChessGame.TeamColor myPieceColor = mypiece.getTeamColor();
+//
+//        //If is enemy color
+//        if (!(myPieceColor.equals(potentialpiece.getTeamColor()))){
+//            return true;
+//        }
+//        else{
+//            return false;
+//        }
+//    }
+//    else{
+//        return false;
+//    }
+//}
+////Diagonal
+//public void diagonal(ChessPosition br, ChessPosition bl, HashSet<ChessMove> moves, ChessPosition myPosition, ChessBoard board) {
+//    //Row and Col values
+//    int brRow = br.getRow();
+//    int brCol = br.getColumn();
+//    int blRow = bl.getRow();
+//    int blCol = bl.getColumn();
+//
+//    //adding corner chess positions
+//    if (((myPosition.getRow() != brRow) && (myPosition.getColumn() != brCol))) {
+//        moves.add(new ChessMove(myPosition, br, null));
+//    }
+//    if (((myPosition.getRow() != blRow) && (myPosition.getColumn() != blCol))) {
+//        moves.add(new ChessMove(myPosition, bl, null));
+//    }
+//    //if enemy hit
+//    boolean hitPieceBR = false;
+//    boolean hitPieceBL = false;
+//
+//    //While it hasn't hit bounds or the enemy
+//    while ((brRow < 8 && brCol > 1) && (!hitPieceBR)) {
+//        brRow = brRow + 1;
+//        brCol = brCol - 1;
+//
+//        //is empty
+//        if (emptyposition(brRow, brCol, board, myPosition)) {
+//            moves.add(new ChessMove(myPosition, new ChessPosition(brRow, brCol), null));
+//        }
+//        //is an enemy
+//        else if (isEnemy(brRow, brCol, board, myPosition)) {
+//            moves.add(new ChessMove(myPosition, new ChessPosition(brRow, brCol), null));
+//            hitPieceBR = true;
+//        }
+//        //is a friend and not OG
+//        else if (!isEnemy(brRow, brCol, board, myPosition) && !(myPosition.equals(new ChessPosition(brRow,brCol)))) {
+//            hitPieceBR = true;
+//        }
+//        //is original
+//        else {
+//            continue;
+//        }
+//
+//    }
+//    while (blRow < 8 && blCol < 8 && (!hitPieceBL)) {
+//        //bl
+//        //increment
+//        blRow = blRow + 1;
+//        blCol = blCol + 1;
+//        //is empty
+//        if (emptyposition(blRow, blCol, board, myPosition)) {
+//            moves.add(new ChessMove(myPosition, new ChessPosition(blRow, blCol), null));
+//        }
+//        //is an enemy
+//        else if (isEnemy(blRow, blCol, board, myPosition)) {
+//            moves.add(new ChessMove(myPosition, new ChessPosition(blRow, blCol), null));
+//            hitPieceBL = true;
+//        }
+//        //is a friend not OG
+//        else if (!isEnemy(blRow, blCol, board, myPosition) && !(myPosition.equals(new ChessPosition(blRow,blCol)))) {
+//            hitPieceBL = true;
+//        }
+//        //is original
+//        else {
+//            continue;
+//        }
+//    }
+//}
 
 
 
