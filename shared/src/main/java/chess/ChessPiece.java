@@ -123,6 +123,7 @@ public class ChessPiece {
 
 
         //error catch
+        //test new commit example
         if (firstMove == 0) {
             throw new IllegalArgumentException("firstMove isn't updating");
         }
