@@ -68,29 +68,19 @@ public class ChessPiece {
         var Queen = PieceType.QUEEN;
         var King = PieceType.KING;
 
-        //Pawn
-        if ((pieceType == Pawn)) {
-            pawnMoves(moves, myPosition, board);
-        }
-        //Rooks
-        else if (pieceType == Rook) {
-            rookMoves(moves, myPosition, board);
-        }
-        //Knight
-        else if (pieceType == Knight) {
-            knightMoves(moves, myPosition, board);
-        }
-        //Bishop
-        else if (pieceType == Bishop) {
-            bishopMoves(moves, myPosition, board);
-        }
-        //Queen
-        else if (pieceType == Queen) {
-            queenMoves(moves, myPosition, board);
-        }
-        //King
-        else if (pieceType == King) {
-            kingMoves(moves, myPosition, board);
+        switch(pieceType) {
+            //Pawn
+            case PAWN -> pawnMoves(moves, myPosition, board);
+            //Rooks
+            case ROOK -> rookMoves(moves, myPosition, board);
+            //Knight
+            case KNIGHT -> knightMoves(moves, myPosition, board);
+            //Bishop
+            case BISHOP -> bishopMoves(moves, myPosition, board);
+            //Queen
+            case QUEEN -> queenMoves(moves, myPosition, board);
+            //King
+            case KING -> kingMoves(moves, myPosition, board);
         }
         return moves;
     }
