@@ -1,6 +1,11 @@
 # Textbook link:
 https://github.com/danagow/books/blob/master/Core%20Java%20SE%209%20for%20the%20Impatient%2C%202nd%20Edition.pdf
 
+# Copy a the Chess Github repository:
+Video explanation: https://www.loom.com/share/2b2dd64e7b524b3f9b396318cf140159?sid=a6c1b75f-a73f-455e-976c-ba19052117a6
+Click on link then click "Use this template": https://github.com/softwareconstruction240/chess 
+
+
 # Fail_of_Default_Terminals_Commands
 This should fix the issue:
 Correct the path using the following command:
