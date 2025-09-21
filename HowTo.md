@@ -5,6 +5,9 @@ https://github.com/danagow/books/blob/master/Core%20Java%20SE%209%20for%20the%20
 Video explanation: https://www.loom.com/share/2b2dd64e7b524b3f9b396318cf140159?sid=a6c1b75f-a73f-455e-976c-ba19052117a6
 Click on link then click "Use this template": https://github.com/softwareconstruction240/chess 
 
+# The compiler gives you the error: java: error: release version 23 not supported
+command + ; and choose openjdk-24
+
 
 # Fail_of_Default_Terminals_Commands
 This should fix the issue:
