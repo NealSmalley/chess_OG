@@ -61,3 +61,12 @@ type idea and the intelliJ should open up.
 - click command n
 - override methods
 - hashCode() and equals()
+
+# How to open a Zoom meeting
+
+- login to Zoom
+- launch Zoom
+- <img width="319" height="237" alt="Screenshot 2025-10-07 at 2 44 43 PM" src="https://github.com/user-attachments/assets/4e01ee49-f116-4054-b84b-6ab05bd98b0a" />
+- bottom left corner click on the bottom numbers
+- <img width="454" height="255" alt="Screenshot 2025-10-07 at 2 45 45 PM" src="https://github.com/user-attachments/assets/57ccacb5-25e4-40ab-b446-7f055207aaa6" />
+- Click start
